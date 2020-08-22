@@ -1,4 +1,6 @@
-module Effects.CPSUnstaged where
+-- port from effekt-idris
+
+module Witch.Effects.CPSUnstaged where
 
 open import Function using (id)
 open import Data.Nat using (ℕ; _+_)
