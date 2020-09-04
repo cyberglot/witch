@@ -28,9 +28,3 @@ bind m f = \ {k -> m (push f k)}
 
 _>>=_ : {A : Set} {R : Set} {B : Set} → Cps R A -> (A -> Cps R B) -> Cps R B
 m >>= f = bind m f
-
-example : ℕ
-example = 1 + reset0
-  (do
-    x ← shift0 \ {k → k (k 100)}
-    pure (10 + x))
