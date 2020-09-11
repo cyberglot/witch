@@ -7,7 +7,7 @@
   in proof assistants: an effect-based attempt}
 
 \author{April Gonçalves}
-\email{april@cyberglot.me}
+\email{april@metastate.dev}
 \affiliation{
   \institution{Metastate AG}
   \city{Edinburgh}
@@ -143,19 +143,30 @@ work, which are presented as follows:
     \label{fig:prototype}
 \end{figure}
 
-In this section, we introduce our tool, named Witch.
+In this section, we introduce our tool, named Witch\footnote{Our tool's name is
+  a play after assistant tools colloquially called ``wizards''. There is no
+  consensus of what a wizard is or what are exactly the tasks it is supposed
+  to help users. It seems to be used mostly for multiple-step and/or
+  configuration features, however. We went for the name ``witch'' to align it to
+the idea of assistant tools, while dodging an overloaded terminology.}.
 
 \paragraph{Downsides of our approach}
 There are two main styles for writing proofs within a proof assistant: external
 verification and internal verification. The latter concerns itself with code
 that is \textit{correct-by-construction}, meaning that only valid states allowed and it
 carries all information necessary to make proofs trivial; while the former
-concerns itself with proofs about non-proof-carrying code.
+concerns itself with proofs about code that does not carry any additional
+information for proving purposes.
 Witch's primarily focus is on external verification. We believe that newcomers
 will struggle to write proof-aware code, since it departs strongly from
 mainstream programming, even within the functional style. We expect users to
 write their code as they normally would do and then prove necessary properties.
-However, Witch does not support writing correct-by-construction code.
+However, Witch does not support writing correct-by-construction code. As proofs
+are erased during compilation-time in Juvix, Witch could be extended
+to be indexed by proof objects and parameterised over any type, such as
+\texttt{\{x y: a\} -> Witch (x * y ≡ y * x) a} where we make sure that \texttt{*}
+over \texttt{a} is commutative. However, it is unclear whether having all user's code
+under a monad-like structure would lead to well-structured code.
 
 \section{Witch in Agda} \label{witch-agda}
 
@@ -183,6 +194,12 @@ we translate all calls into optimised continuation-passing style that inlines
 all calls. This strategy also works at compiler-level if necessary. There are
 many strategies to efficiently implement algebraic effects and handlers, but we
 went for the one that seemed the most straight-forward method to implement it in Agda.
+
+\section{Conclusion and Future Work}
+
+While it is hard to say whether we have achieve our goals before user
+evaluations, Witch steps towards a future where proof assistants are more
+friendly towards users, particularly newcomers.
 
 \end{document}
 \endinput
