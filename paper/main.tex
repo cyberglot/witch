@@ -3,7 +3,7 @@
 \usepackage{pdfpages}
 \begin{document}
 
-\title[Towards user-friendliness in theorem provers]{Towards user-friendliness
+\title[Towards user-friendliness in proof assistants]{Towards user-friendliness
   in proof assistants: automated strategies \textbf{via} algebraic effects and handlers}
 
 % \author{April Gonçalves}
@@ -204,8 +204,8 @@ pragmatic differentiation:
       \texttt{throw} and \texttt{trace}: the former notifies the user a strategy
       has failed, while the latter registers\footnote{Internally, the
         Typechecker effect should have a tree that stores all currently
-        saved traces.} completed sub-goals during the
-      strategy's attempt to complete the proof.
+        saved traces.} completed sub-goals during the strategy's attempt to
+      complete the proof.
 \end{itemize}
 
 \paragraph{Witch's Architecture}
@@ -213,7 +213,6 @@ A \textit{witch} sits between the typechecker and the interactive mode of a
 proof assistant. It uses constructs provided by the typechecker and notifies the
 interactive mode with regards to the state of the current strategy attempted.
 The user may manipulate proof handlers by composing or writing their own.
-
 
 
 \paragraph{Downsides of our Approach}
@@ -265,6 +264,26 @@ went for the one that seemed the most straight-forward method to implement it in
 
 \section{Related and Future Work}
 
+\subsection{Comparison with Similar Approaches}
+
+\paragraph{Andromeda proof assistant} As mentioned, this project was inspired by the
+Andromeda proof assistant. It follows the LCF tradition of theorem provers,
+where there exist two distinct languages. One habits a safe nucleus that
+verifies hypotheses, on the other hand, the second hand comprises a polymorphic
+$\lambda$ calculus where users implement their theories and relay the
+verification to the nucleus.
+
+\paragraph{Meta-F*} F* is a dependently typed language with (monadic) effects and liquid
+types. For tactics, F* uses a library called Meta-F*, where tactics are
+considered an effect that uses meta-programming provided by the typechecker to
+manipulate proof objects. Agda's Witch implementation is heavily inspired by Meta-F*.
+
+\paragraph{Mtac and Cybele} The idea of proof strategies happening within an
+effectful structure was first introduced in Cybele and later extended into Mtac.
+Mtac extends Coq's powerful main language, providing the user with a
+dependently-typed tactic language.
+
+\subsection{Improving Witch Further}
 While it is hard to say whether we have achieve our goals before user
 evaluations, Witch steps towards a future where proof assistants are
 friendlier towards users, particularly newcomers. The present work is in its
