@@ -1,6 +1,5 @@
 \documentclass[sigconfl]{acmart}
 
-\newcommand{\comment}[1]{\footnote{Comment:~#1}}
 \usepackage{pdfpages}
 \begin{document}
 
@@ -40,32 +39,27 @@ software to many relevant industries, such as finance.
 \section{Verification for the Masses}
 
 The usability of proof assistants such as Coq, Agda, Isabelle/HOL and Twelf is
-hard to measure: all of them require significant domain knowledge that
-frequently matches a deeper understanding of Type Theory, the theory that
-enables such assistants to exist. Coq and Isabelle/HOL are more commonly applied
-\comment{I'm unsure what ``that frequently matches a deeper understanding of
-  Type Theory'' means... I~assumed the domain knowledge you meant \emph{was}
-  type theory, and perhaps the details of the specific proof assistant.}
-outside their niche, and their programming style is sharply different from
+hard to measure: all of them require significant domain knowledge in type
+theory, the theory that enables such assistants to exist. Coq and Isabelle/HOL
+are more commonly applied outside their niche, and their programming style is
+sharply different from
 mainstream programming and even functional programming. Granted, they come with
 their own integrated development environment (IDE), which may make it easier for
 students and newcomers. To our knowledge, no usability study has been
 held for a proof assistant, however there exists studies that account for
 informal ``usability'' criteria -- they appear to measure how fast users can
-\comment{Usage of ``appear'' seems like you're gonna really shit on these studies?}
 familiarise themselves with the system or IDE.
 
 Folklore within the proof assistants community says that newcomers
 find Coq hard to use due to a large library of tactics and difficulty reading
 the code after its completion. Many Coq learning materials suggest that users
-add comments for structural induction cases and inductive hypothesis. As
-mentioned, no user studies were conducted to attest such hypotheses.
-\comment{Double use of hypothesis with different denotations is confusing.}
+add code comments for structural induction cases and inductive hypothesis. As
+mentioned, no user studies were conducted to attest that such strategy improves
+the perceived quality of Coq proofs.
 
 Granted, proof assistants are a relatively new technology
 and there are no guidelines or even an intuition on how such systems should
-perform or what features should be available to the users. The closest model we
-\comment{Not sure what you mean by ``perform'', do you mean ``work/function''?}
+work or what features should be available to the users. The closest model we
 have are proofs by hand. However, following that model for proof assistants has
 two main pitfalls: (a) proofs by hand are not widely taught outside of
 university mathematics courses; and (b) proof by hand and automated proof
@@ -105,14 +99,11 @@ The reasons we employ algebraic effects and handlers are numerous:
   intricate effects machinery such as monad transformers;
 \item the semantics of effects and handlers accommodate composition of arbitrary effects and the
   composition of multiple handlers, which means users have the ability to weaken
-  more general strategies into specific ones while maintaining the original untouched;
-  \comment{Not sure what you mean by ``original'' here?}
+  more general strategies into specific ones while maintaining top-level
+  handlers unmodified;
 \item effects and handlers have well-defined semantics, and it is the main feature of many new
   research languages, such as Koka, Eff, Frank and Effekt, which suggests a greater
-  potential.
-  \comment{You may need to explain that potential; does it result from the
-    prediction that more programmers will be familiar with effects in the
-    future, due to their popularity?}
+  potential due to their popularity.
 \end{enumerate}
 
 \subsection{Goals and Contributions}
@@ -168,12 +159,11 @@ as the means of congregation.
 
 \paragraph{Algebraic Effects and Handlers} Algebraic effects were introduced by
 **citation, and their handlers were introduced later on by **citation. An
-algebraic effect is defined by an effect signature that comprises a set of
+algebraic effect is defined by a set of
 operations, and handlers that denote said operations. A handler may interpret
 operations at the compiler-level, which was formally named co-model, but
 colloquially called ``top-level handler''. Handlers are the most general form to
-denote a set of operation, and more specific classes of handlers also exist.
-\comment{I'm pretty confused by the past few sentences.}
+denote a set of operations, and less general classes of handlers also exist.
 
 \paragraph{The Essence of Witch}
 In Figure \ref{fig:prototype}, we sum up our \textit{witch} approach.
@@ -189,11 +179,9 @@ commutativity of addition under natural numbers and of associativity of list
 concatenation are shown, and use the three main effects: Solver, Proof Search
 and Tactics. In the proof assistant literature, there exists no precise
 definition of commonly used terms ``solver'', ``proof search'' and ``tactics''.
-All these terms are used in different communities, and mean some variation of ``automatic strategy to
-construct a term under certain constraints''. Here, however, we use the
-\comment{Not technically ``construct a term'', e.g., F* and Liquid Haskell's use
-  of SMT solvers never constructs any term.}
-following definitions:
+All these terms are used in different communities, and mean some variation of
+``automatic strategy to construct a term under certain constraints''. Here,
+however, we use the following definitions:
 \begin{itemize}
   \item The Solver effect is used for integration with external solvers via IO;
     we believe should suffice for the user to write, e.g. \texttt{SMT}, and handlers should
@@ -203,20 +191,20 @@ following definitions:
     \texttt{operation \{ params \} via Z3.QF-UFLIA}.
   \item The Proof Search effect is used for library-level algorithms; users may
     choose to implement their own algorithms using a limited set of
-    meta-programming constructs that are handled at top-level\footnote{The
+    meta-programming\footnote{By meta-programming, we mean ``code that manipulates
+    itself'', and not ``programming that happens in a higher level of abstraction''.
+    For dependently typed programming languages, the usual term is reflection.
+    However, we prefer not use reflection since it has another meaning in
+    terms of effectful computations.} constructs that are handled at top-level\footnote{The
       meta-programming constructs are operations of the Typechecker effect
       whose handlers are not available for the user.}.
-    \comment{You essentially mean ``reflection'' here, right? You may want to
-      use that word, or ``quoting'', or whatnot, explicitly.}
   \item The Tactics effect is used for strategies that simplify the goal at
     least one step, and may not complete all proof goals. This style is mainly
     used in the proof assistant Coq. While we do not foresee using as many as many
     tactics implemented as in Coq, we believe tactics such as
-    \texttt{omega}, \texttt{ring}, \texttt{Admitted} are useful to users of
+    \texttt{eauto}, \texttt{??}, \texttt{??} are useful to users of
     all levels of expertise.
-    \comment{All three of these tactics are total, so you may want to use
-      examples which can fail or return partial proofs, such as \texttt{eauto}.}
-  \item Lastly, the Error effect is used for feedback to the user,
+    \item Lastly, the Error effect is used for feedback to the user,
     since any of the strategies may fail. Error has two operations,
     \texttt{throw} and \texttt{trace}: the former notifies the user that a strategy
     has failed, while the latter registers\footnote{Internally, the
@@ -227,16 +215,14 @@ following definitions:
 
 \paragraph{Witch's Architecture}
 A \textit{witch} sits between the typechecker and the interactive mode of a
-proof assistant. It uses constructs provided by the typechecker and communicates
-with the interactive mode about the state of the current attempted strategy.
-\comment{Perhaps rephrase this sentence, as it's a bit unclear?}
+proof assistant. It uses meta-programming constructs provided by the typechecker and notifies
+the interactive mode about whether the current attempted strategy was successful.
 The user may manipulate proof handlers by composing or writing their own.
 
 
 \paragraph{Downsides of our Approach}
 There are two main styles for writing proofs within a proof assistant: external
 verification and internal verification. The latter encourages code
-\comment{Consider using extrinsic versus intrinsic.}
 that is \textit{correct-by-construction}, meaning only valid states can be
 encoded and values carry all information necessary to make proofs trivial; while
 the former encourages writing code as usual, and reconstructing information
@@ -250,11 +236,7 @@ are erased during compilation-time in Juvix, Witch could be extended
 to be indexed by proof objects and parameterised over any type, such as
 \texttt{\{A: Type\} $\rightarrow$ x y: A $\rightarrow$ }
 \includegraphics[height=0.02\textheight]{image/hat.eps} \texttt{ (x * y $\equiv$
-  y * x) } where we make sure that \texttt{*} over \texttt{A} is commutative.
-\comment{Sentence is confusing, please rephrase?}
-However, it is unclear whether having user's code under a monad-like structure leads
-to well-structured code.
-\comment{Sentence is confusing, please rephrase?}
+  y * x) }.
 
 
 \section{Agda's Witch} \label{witch-agda}
@@ -278,8 +260,9 @@ is no built-in solution, a library-level solution is possible -- as we did in
 Agda. However, a solid implementation may not be trivial to achieve. In Agda,
 we translate effect handling into optimised continuation-passing style that inlines
 all applications. This strategy can also be implemented at the compiler-level,
-if necessary. There are many strategies to efficiently implement algebraic effects and handlers, but we
-opted for the one that seemed the most straight-forward method to implement it in Agda.
+if necessary. There are many strategies to efficiently implement algebraic
+effects and handlers, but we opted for the one that seemed the most
+straight-forward method to implement it in Agda.
 
 \section{Related and Future Work}
 
@@ -308,18 +291,13 @@ evaluations, Witch is a first step towards a future where proof assistants are
 friendlier to users, particularly newcomers. The present work is in its
 infancy, and there are many open problems regarding Witch's ability to guide newcomers
 towards correct-by-construction software, which constitutes the main improvement
-we intend for Witch.
-
-We hypothesise possibility of using proof
-reconstruction, therefore relocating Witch to an assistant that lives solely
+we intend for Witch. We hypothesise possibility of inserting into the source
+code a  \textit{proof sketch} that contains sub-goals of interest for the user and guides the
+typechecker to rebuild the derivation tree faster. This change would, therefore,
+relocate Witch to an assistant that lives solely
 within the interactive mode -- as opposed to a framework for proof
-automation in user code.
-\comment{You should rephrase this -- it isn't a matter of proof reconstruction
-  per se, since most strategies generate proof objects in the compiler. Instead,
-it's a matter of inserting these objects into the source files. Note that this
-makes the proofs more brittle, since one advantage of tactics is that if your
-data types change slightly, proofs don't necessarily break, but instead your
-solver may compute a difference solution.}
+automation in user code. The implementation of such feature may present itself
+as a challenge, however.
 
 In parallel with the usability work, we plan to develop a formalisation of Witch
 as a dependent typed language with effectful, dependently typed operations and
