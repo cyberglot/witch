@@ -1,20 +1,20 @@
-\documentclass[acmsmall]{acmart}
+\documentclass[sigconfl]{acmart}
 
 \usepackage{pdfpages}
 \begin{document}
 
 \title[Towards user-friendliness in theorem provers]{Towards user-friendliness
-  in proof assistants: an effect-based attempt}
+  in proof assistants: automated strategies \textbf{via} algebraic effects and handlers}
 
-\author{April Gonçalves}
-\email{april@metastate.dev}
-\affiliation{
-  \institution{Metastate AG}
-  \city{Edinburgh}
-  \state{UK}
-}
+% \author{April Gonçalves}
+% \email{april@metastate.dev}
+% \affiliation{
+%   \institution{Metastate}
+%   \city{Edinburgh}
+%   \state{UK}
+% }
 
-\renewcommand{\shortauthors}{April Gonçalves}
+% \renewcommand{\shortauthors}{April Gonçalves}
 
 \begin{abstract}
 Proof assistants provide a framework for modelling and verification of
@@ -73,8 +73,8 @@ burden to the user. Currently, only specialists can write proofs for their
 programs, even though the working programmer understands the domain and
 invariants of their projects -- otherwise they would not be able to write any
 software. \textit{Our hypothesis is that programmers are well-equipped to derive and
-prove properties of their software, but they lack the mathematical maturity and
-vocabulary to carry on a formal proof. } We have evidence that students fail to
+prove properties of the software they write, but they lack the mathematical maturity and
+vocabulary to carry out a formal proof. } We have evidence that students fail to
 produce well-made proofs due to the lack of mathematical maturity, even though
 they do understand the subject matter at hand.
 
@@ -85,7 +85,7 @@ a proof environment as an effect to prove certain properties as they go. Given
 that the proof environment is \textit{just} an effect, we envision that different proof
 styles (e.g, Agda-style dependent types, SMT solver, proof search) can be ``composed''
 under a shared interface, a proof object that can manipulate itself while
-querying different automated proof engines.
+enquiring different automated proof engines.
 
 The reasons we employ algebraic effects and handlers are manifold:
 \begin{enumerate}
@@ -101,15 +101,16 @@ The reasons we employ algebraic effects and handlers are manifold:
   more general strategies into specific ones while maintaining the original untouched;
 \item it has well-defined semantics, and it is the main feature of many new
   research languages, such as Koka, Eff, Frank and Effekt, what suggests a greater
-  potential to be investigated further.
+  potential.
 \end{enumerate}
 
 \subsection{Goals and Contributions}
 
-The present project is still under development, and we intend to develop a core calculus and a
-full compiler-level implementation into the Juvix\footnote{Juvix is a
-  dependently-typed programming language for smart contracts. More information
-  at juvix.org} programming language.
+The present project intends to land itself as a compiler-level implementation into the
+Juvix\footnote{Juvix is a dependently-typed programming language for smart
+  contracts. More information at juvix.org} programming language. We design
+Juvix with focus on working programmers familiar with strongly-typed functional
+programming.
 
 \paragraph{Goals} The project exists to enable users to write safe, verified
 code without investing time into learning dependent types and theorem proving.
@@ -138,22 +139,87 @@ work, which are presented as follows:
 
 \begin{figure}[!ht]
    \centering
-    \includegraphics[width=\textwidth]{image/witch.eps}
-    \caption{Low-fidelity prototype of Witch}
+    \includegraphics[height=\textheight]{image/witch.eps}
+    \caption{Summary of Witch pertaining to strategies, examples
+      and the architecture.}
     \label{fig:prototype}
 \end{figure}
 
-In this section, we introduce our tool, named Witch\footnote{Our tool's name is
+In this section, we introduce our approach, named Witch\footnote{Our tool's name is
   a play after assistant tools colloquially called ``wizards''. There is no
   consensus of what a wizard is or what are exactly the tasks it is supposed
-  to help users. It seems to be used mostly for multiple-step and/or
+  to help users. Wizards seem to be used mostly for multiple-step and/or
   configuration features, however. We went for the name ``witch'' to align it to
-the idea of assistant tools, while dodging an overloaded terminology.}.
+the idea of assistant tools, while dodging the overloaded, yet nebulous
+terminology.}. We define a \textit{witch} as an assistant tool for theorem
+provers that congregates many different strategies for proof automation. Our
+specification for a \textit{witch} for Juvix uses algebraic effects and handlers
+as the means to congregate strategies as effects.
 
-\paragraph{Downsides of our approach}
+\paragraph{Algebraic Effects and Handlers} Algebraic effects were introduced by
+**citation, and their handlers were introduced later on by **citation. An
+algebraic effect is defined by an effect signature that comprises a set of
+operations, and handlers that denote said operations. A handler may interpret
+operations at the compiler-level, which was formally named co-model, but
+colloquially called ``top-level handler''. Handlers are the most general form to
+denote a set of operation, and more specific classes of handlers also exist.
+
+\paragraph{The Essence of Witch}
+In Figure \ref{fig:prototype}, we sum up our \textit{witch} approach.
+As for the syntax, we use \texttt{operation \{ params \} via handler} that is an
+improvement over \texttt{handler(operation, params)}, since effect handling is similar
+to function application where it carries effect information as well.
+The user defines data types and functions as usual, and then uses a
+\textit{witch} to prove properties concerning said definitions. The Examples
+section in Figure \ref{fig:prototype} shows it in action. The examples are
+over-simplified to enable a clearer communication of our proposal -- we avoid
+more complex properties and complicated proofs as initial examples. The proof of
+commutativity of addition under natural numbers and of associativity of list
+concatenation are shown, and use the three main effects: Solver, Proof Search
+and Tactics. In the proof assistant literature, there exists no precise
+definition of commonly used terms ``solver'', ``proof search'' and ``tactics''.
+All said terms are used in different communities to mean ``automatic strategy to
+construct a term under certain constraints''. Here, however, we opt for a
+pragmatic differentiation:
+\begin{itemize}
+  \item The Solver effect is used for integration with external engines via IO;
+    we believe it suffices to say, e.g. \texttt{SMT}, as handlers should
+    implement internal strategies to choose between the so-called logics
+    within a solver. If the black-box approach to solvers presents itself a
+    challenge, an specialisation of the handler is possible, e.g.
+    \texttt{operation \{ params \} via Z3.QF-UFLIA}.
+  \item The Proof Search effect is used for library-level algorithms; users may
+    choose to implement their own algorithms using a limited set of
+    meta-programming constructs that are handled at top-level\footnote{The
+      meta-programming constructs are operations of the Typechecker effect
+      whose handlers are not available for the user.}.
+    \item The Tactics effect represent strategies that simplifies the proof at
+      least one step, and may not complete all proof goals. This style is mainly
+      employed in the proof assistant Coq. While we do not foresee as many
+      tactics implemented as in Coq, we believe famous tactics such as
+      \texttt{omega}, \texttt{ring}, \texttt{Admitted} are useful to users of
+      all levels of expertise.
+    \item Lastly, the Error effect represents feedback messages to the user,
+      since any of the strategies may fail. Error has two operations,
+      \texttt{throw} and \texttt{trace}: the former notifies the user a strategy
+      has failed, while the latter registers\footnote{Internally, the
+        Typechecker effect should have a tree that stores all currently
+        saved traces.} completed sub-goals during the
+      strategy's attempt to complete the proof.
+\end{itemize}
+
+\paragraph{Witch's Architecture}
+A \textit{witch} sits between the typechecker and the interactive mode of a
+proof assistant. It uses constructs provided by the typechecker and notifies the
+interactive mode with regards to the state of the current strategy attempted.
+The user may manipulate proof handlers by composing or writing their own.
+
+
+
+\paragraph{Downsides of our Approach}
 There are two main styles for writing proofs within a proof assistant: external
 verification and internal verification. The latter concerns itself with code
-that is \textit{correct-by-construction}, meaning that only valid states allowed and it
+that is \textit{correct-by-construction}, meaning that only valid states can be encoded and it
 carries all information necessary to make proofs trivial; while the former
 concerns itself with proofs about code that does not carry any additional
 information for proving purposes.
@@ -161,21 +227,23 @@ Witch's primarily focus is on external verification. We believe that newcomers
 will struggle to write proof-aware code, since it departs strongly from
 mainstream programming, even within the functional style. We expect users to
 write their code as they normally would do and then prove necessary properties.
-However, Witch does not support writing correct-by-construction code. As proofs
+Witch does not support writing correct-by-construction code. As proofs
 are erased during compilation-time in Juvix, Witch could be extended
 to be indexed by proof objects and parameterised over any type, such as
-\texttt{\{x y: a\} -> Witch (x * y ≡ y * x) a} where we make sure that \texttt{*}
-over \texttt{a} is commutative. However, it is unclear whether having all user's code
-under a monad-like structure would lead to well-structured code.
+\texttt{\{A: Type\} $\rightarrow$ x y: A $\rightarrow$ }
+\includegraphics[height=0.02\textheight]{image/hat.eps} \texttt{ (x * y $\equiv$
+  y * x) } where we make sure that \texttt{*} over \texttt{A} is commutative.
+However, it is unclear whether having user's code under a monad-like structure leads
+to well-structured code.
 
-\section{Witch in Agda} \label{witch-agda}
+\section{Agda's Witch} \label{witch-agda}
 
 
 
 
 
-\paragraph{Why Agda?} Agda provides high-level meta-programming constructs, and
-its coding style is a reminiscent of ML family of functional programming languages.
+\paragraph{Why Agda?} Agda provides higher-level meta-programming constructs, and
+its coding style is a reminiscent of the ML family of functional programming languages.
 
 \subsection{Technical Effort Required} \label{tech-details}
 
@@ -190,16 +258,26 @@ that no solver will be integrated, diminishing the proposed value of the tool.
 Lastly, proof assistants must support algebraic effects and handlers. If there
 is no built-in solution, a library-level solution is possible -- as we did in
 Agda. However, a solid implementation may not be trivial to achieve. In Agda,
-we translate all calls into optimised continuation-passing style that inlines
-all calls. This strategy also works at compiler-level if necessary. There are
+we translate effect handling into optimised continuation-passing style that inlines
+all applications. This strategy also works at compiler-level if necessary. There exist
 many strategies to efficiently implement algebraic effects and handlers, but we
 went for the one that seemed the most straight-forward method to implement it in Agda.
 
-\section{Conclusion and Future Work}
+\section{Related and Future Work}
 
 While it is hard to say whether we have achieve our goals before user
-evaluations, Witch steps towards a future where proof assistants are more
-friendly towards users, particularly newcomers.
+evaluations, Witch steps towards a future where proof assistants are
+friendlier towards users, particularly newcomers. The present work is in its
+infancy, and there are many issues concerning Witch's ability to guide newcomers
+towards correct-by-construction software, which constitutes the main improvement
+we intend for Witch. We hypothesise about the possibility of using proof
+reconstruction, therefore relocating Witch to an assistant that lives solely
+within the interactive mode -- as opposed to a framework for proof
+automation in user code.
+
+In parallel with the usability work, we plan to develop a formalisation of Witch
+as a dependent typed language with effectful, dependently typed operations and
+effect handler, based on previous work on fibred algebraic effects.
 
 \end{document}
 \endinput
