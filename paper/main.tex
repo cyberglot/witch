@@ -29,7 +29,7 @@ extend our system with new effects and new handlers. Lastly, we prototype the
 system as a library in Agda. While our prototype is minimal, it shows how easily
 proofs can be carried out so long as the user has the correct intuition. We
 believe our system empowers non-experts and has the potential to bring verified
-software to many relevant industries, such as finance.
+software to relevant industries, such as finance.
 \end{abstract}
 
 \keywords{effect handlers, proof assistants, user experience}
@@ -38,21 +38,26 @@ software to many relevant industries, such as finance.
 
 \section{Verification for the Masses}
 
-The usability of proof assistants such as Coq, Agda, Isabelle/HOL and Twelf is
+The usability of proof assistants such as Coq \cite{DBLP:journals/corr/abs-cs-0603118} and Agda
+\cite{DBLP:conf/tldi/Norell09} is
 hard to measure: all of them require significant domain knowledge in type
 theory, the theory that enables such assistants to exist. Coq and Isabelle/HOL
-are more commonly applied outside their niche, and their programming style is
+are more commonly applied outside their niche
+\cite{DBLP:journals/corr/abs-1907-10674, peltier:hal-01562944}, and their programming style is
 sharply different from
 mainstream programming and even functional programming. Granted, they come with
-their own integrated development environment (IDE), which may make it easier for
+their own integrated development environment (IDE)
+\cite{DBLP:journals/sttt/FaithfullBTT18, DBLP:conf/itp/RoeS16}, which may make it easier for
 students and newcomers. To our knowledge, no usability study has been
 held for a proof assistant, however there exists studies that account for
 informal ``usability'' criteria -- they appear to measure how fast users can
-familiarise themselves with the system or IDE.
+familiarise themselves with the system or IDE \cite{Wiedijk2003,
+  DBLP:journals/corr/abs-1808-09701}.
 
 Folklore within the proof assistants community says that newcomers
 find Coq hard to use due to a large library of tactics and difficulty reading
-the code after its completion. Many Coq learning materials suggest that users
+the code after its completion. Coq learning materials, such as ``Software
+Foundations'' by Pierce \textit{et al},  suggest that users
 add code comments for structural induction cases and inductive hypothesis. As
 mentioned, no user studies were conducted to attest that such strategy improves
 the perceived quality of Coq proofs.
@@ -62,10 +67,9 @@ and there are no guidelines or even an intuition on how such systems should
 work or what features should be available to the users. The closest model we
 have are proofs by hand. However, following that model for proof assistants has
 two main pitfalls: (a) proofs by hand are not widely taught outside of
-university mathematics courses; and (b) proof by hand and automated proof
+college-level mathematics courses \cite{Anapa2010}; and (b) proof by hand and automated proof
 employ fundamentally different paradigms, where the latter requires
-axioms and formulations to be encoded explicitly, commonly known as a ``pedantic
-proof style''.
+axioms and formulations to be encoded explicitly.
 
 \subsection{Empowering users of different levels of expertise}
 
@@ -77,14 +81,14 @@ software. \textit{Our hypothesis is that programmers are well-equipped to derive
 prove properties of the software they write, but they lack the mathematical maturity and
 vocabulary to carry out a formal proof.} We have evidence that students fail to
 produce well-made proofs due to the lack of mathematical maturity, even though
-they do understand the subject matter at hand.
+they do understand the subject matter at hand \cite{Knobelsdorf2017, Knobelsdorf2016}.
 
 In our approach, we propose an effects and handlers view of such
-proofs, based on prior work developed on the Andromeda proof assistant. Here,
+proofs, based on prior work developed on the Andromeda proof assistant \cite{Bauer2018}. Here,
 our users will program as they would normally and invoke
 the proof environment as an effect to prove certain properties as they go. Given
 that the proof environment is \textit{just} an effect, we envision that different proof
-styles (e.g., Agda-style dependent types, SMT solver, proof search) can be ``composed''
+styles (e.g., Agda-style dependent types , SMT solver, proof search) can be ``composed''
 under a shared interface, a proof object that can manipulate itself while
 querying different automated provers.
 
@@ -102,7 +106,9 @@ The reasons we employ algebraic effects and handlers are numerous:
   more general strategies into specific ones while maintaining top-level
   handlers unmodified;
 \item effects and handlers have well-defined semantics, and it is the main feature of many new
-  research languages, such as Koka, Eff, Frank and Effekt, which suggests a greater
+  research languages, such as Koka \cite{Leijen2017}, Eff \cite{Bauer2012},
+  Frank \cite{DBLP:journals/jfp/ConventLMM20} and Effekt
+  \cite{DBLP:journals/jfp/BrachthauserSO20}, which suggests a greater
   potential due to their popularity.
 \end{enumerate}
 
@@ -130,10 +136,9 @@ makes three important contributions that pave the way for the full implementatio
 \item a specification of a user interface for automated proofs based on
   algebraic effects and handlers that permits user-defined effects for proof
   strategies, and also user-defined handlers for existing effects (Section \ref{intro-witch});
-\item a minimal prototype in Agda that validates the feasibility of such system
-  (Section \ref{witch-agda});
 \item a short technical account of the effort required to implement such a
-  user interface for proof assistants (Section \ref{tech-details}).
+  user interface for proof assistants via a a minimal prototype in Agda that
+  validates the feasibility of such system  (Section \ref{tech-details}).
 \end{enumerate}
 
 \section{Introducing Witch} \label{intro-witch}
@@ -158,12 +163,14 @@ specification for a \textit{witch} for Juvix uses algebraic effects and handlers
 as the means of congregation.
 
 \paragraph{Algebraic Effects and Handlers} Algebraic effects were introduced by
-**citation, and their handlers were introduced later on by **citation. An
+Plotkin \textit{et al} \cite{Plotkin2003}, and their handlers were introduced later on by
+Plotkin \& Pretnar \cite{Plotkin2013}. An
 algebraic effect is defined by a set of
 operations, and handlers that denote said operations. A handler may interpret
 operations at the compiler-level, which was formally named co-model, but
 colloquially called ``top-level handler''. Handlers are the most general form to
-denote a set of operations, and less general classes of handlers also exist.
+denote a set of operations, and less general classes of handlers also exist
+\cite{DBLP:conf/esop/AhmanB20}.
 
 \paragraph{The Essence of Witch}
 In Figure \ref{fig:prototype}, we sum up our \textit{witch} approach.
@@ -188,7 +195,7 @@ however, we use the following definitions:
     implement internal strategies to choose between the different theories
     supported by solvers. If the black-box approach to solvers presents itself a
     challenge, a specialisation of the handler is possible, e.g.
-    \texttt{operation \{ params \} via Z3.QF-UFLIA}.
+    \texttt{operation \{ params \} via Z3.QF-UFLIA} \cite{Z32008}.
   \item The Proof Search effect is used for library-level algorithms; users may
     choose to implement their own algorithms using a limited set of
     meta-programming\footnote{By meta-programming, we mean ``code that manipulates
@@ -202,7 +209,7 @@ however, we use the following definitions:
     least one step, and may not complete all proof goals. This style is mainly
     used in the proof assistant Coq. While we do not foresee using as many as many
     tactics implemented as in Coq, we believe tactics such as
-    \texttt{eauto}, \texttt{??}, \texttt{??} are useful to users of
+    \texttt{eauto}, \texttt{rewrite}, \texttt{unfold} are useful to users of
     all levels of expertise.
     \item Lastly, the Error effect is used for feedback to the user,
     since any of the strategies may fail. Error has two operations,
@@ -234,17 +241,12 @@ write their code as they normally would do and then prove necessary properties.
 Witch does not support writing correct-by-construction code. As proofs
 are erased during compilation-time in Juvix, Witch could be extended
 to be indexed by proof objects and parameterised over any type, such as
-\texttt{\{A: Type\} $\rightarrow$ x y: A $\rightarrow$ }
+\texttt{$\forall $ \{A: Type\} (x y: A) $\rightarrow$ }
 \includegraphics[height=0.02\textheight]{image/hat.eps} \texttt{ (x * y $\equiv$
   y * x) }.
 
 
-\section{Agda's Witch} \label{witch-agda}
-
-\paragraph{Why Agda?} Agda provides higher-level meta-programming constructs, and
-its coding style is a reminiscent of the ML family of functional programming languages.
-
-\subsection{Technical Effort Required} \label{tech-details}
+\section{Technical Effort Required and Prototype in Agda} \label{tech-details}
 
 Although Witch can be implemented as a library, it requires certain features
 from the proof assistant. The most important feature is type-level
@@ -257,31 +259,38 @@ It is not essential, its absence means that no external solver can be
 integrated, diminishing the value of the tool.
 Lastly, the proof assistant must support algebraic effects and handlers. If there
 is no built-in solution, a library-level solution is possible -- as we did in
-Agda. However, a solid implementation may not be trivial to achieve. In Agda,
+Agda. However, a solid implementation may not be trivial to achieve.
+
+In Agda,
 we translate effect handling into optimised continuation-passing style that inlines
 all applications. This strategy can also be implemented at the compiler-level,
 if necessary. There are many strategies to efficiently implement algebraic
 effects and handlers, but we opted for the one that seemed the most
 straight-forward method to implement it in Agda.
 
+\paragraph{Why Agda?} Agda provides higher-level meta-programming constructs, and
+its coding style is a reminiscent of the ML family of functional programming
+languages. Agda's meta-programming constructs are built-in and a monadic
+interface is available under the module \texttt{TC} within the standard library.
+
 \section{Related and Future Work}
 
 \subsection{Comparison with Similar Approaches}
 
 \paragraph{Andromeda proof assistant} As mentioned, this project was inspired by the
-Andromeda proof assistant. It follows the LCF tradition of theorem provers,
+Andromeda proof assistant \cite{Bauer2018, DBLP:conf/icms/BauerHP20}. It follows the LCF tradition of theorem provers,
 where there exist two distinct languages. One habits a safe nucleus that
 verifies hypotheses, on the other hand, the second hand comprises a polymorphic
 $\lambda$ calculus where users implement their theories and relay the
 verification to the nucleus.
 
 \paragraph{Meta-F*} F* is a dependently typed language with (monadic) effects and liquid
-types. For tactics, F* uses a library called Meta-F*, where tactics are
+types. For tactics, F* uses a library called Meta-F* \cite{MetaFstar}, where tactics are
 considered an effect that uses meta-programming provided by the typechecker to
 manipulate proof objects. Agda's Witch implementation is heavily inspired by Meta-F*.
 
 \paragraph{Mtac and Cybele} The idea of proof strategies happening within an
-effectful structure was first introduced in Cybele and later extended into Mtac.
+effectful structure was first introduced in Cybele \cite{Claret2013} and later extended into Mtac \cite{Ziliani2013}.
 Mtac extends Coq's powerful main language, providing the user with a
 dependently-typed tactic language.
 
@@ -301,7 +310,10 @@ as a challenge, however.
 
 In parallel with the usability work, we plan to develop a formalisation of Witch
 as a dependent typed language with effectful, dependently typed operations and
-effect handler, based on previous work on fibred algebraic effects.
+effect handler, based on previous work on fibred algebraic effects
+\cite{DBLP:journals/pacmpl/Ahman18}.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{main}
 
 \end{document}
 \endinput
