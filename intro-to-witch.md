@@ -88,7 +88,7 @@ In Witch, however, we use the following definitions of previously known terms:
     different theories supported by solvers. If the black-box approach
     to solvers presents itself a challenge, a specialisation of the
     handler is possible, e.g. `operation { params } via Z3.QF-UFLIA`
-    [@Z32008].
+    .
 
 -   The Proof Search effect is used for library-level algorithms; users
     may choose to implement their own algorithms using a limited set of
